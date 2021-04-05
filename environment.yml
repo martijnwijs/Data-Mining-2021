@@ -1,0 +1,6 @@
+name: dmt                         
+channels:
+  - defaults
+dependencies:
+  - numpy
+  - pandas
