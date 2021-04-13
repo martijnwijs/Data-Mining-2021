@@ -4,6 +4,10 @@ import csv
 dataset = "dataset_mood_smartphone.csv" 
 
 def read_dataset(dataset): 
+    """ 
+    This function reads the data into a list of dictionaries where: 
+    [{id: AS14.01, time: }]
+    """
     with open(dataset) as csv_file: 
         csv_reader = csv.reader(csv_file)
         header = next(csv_reader)
@@ -23,6 +27,9 @@ def read_dataset(dataset):
 
 data_list = read_dataset(dataset)
             
-            
+# def read_data_daily(dataset): 
 
+#     with open(dataset) as csv_file: 
+#         csv_reader = 
 
+print(data_list[1])
