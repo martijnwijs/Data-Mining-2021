@@ -4,6 +4,32 @@ import csv
 from datetime import datetime
 import itertools
 
+# def create_daily_df(df): 
+#     """
+#     This function aggregates the variable values per day, where it takes the average of mood, arousal and valence. 
+#     It takes the sum of the other variables. 
+#     """
+
+#     # Add date column to dataframe 
+#     df["date"] = df["time"].str[:10]
+
+#     # Define the variables of which we want the mean per day - all other variables are aggregated in a sum. 
+#     mean_vars = ["mood", "circumplex.arousal", "circumplex.valence", "activity"]
+
+#     # Create the dataframe with the means of variables per day  
+#     df_means = df[df["variable"].isin(mean_vars)]
+#     df_means =  df_means.groupby(["id", "date", "variable"], as_index=False)[["value"]].mean()
+
+#     # Create the datafram with the sums of variables per day
+#     df_sums = df[~df["variable"].isin(mean_vars)]
+#     df_sums = df_sums.groupby(["id", "date", "variable"], as_index=False)[["value"]].sum()
+
+#     # Concatenate the two dataframes into the df with daily values
+#     df_daily = pd.concat([df_sums, df_means])
+#     df_daily = df_daily.sort_values(by=["id", "date"])
+
+#     return df_daily
+
 def create_daily_df(df): 
     """
     This function aggregates the variable values per day, where it takes the average of mood, arousal and valence. 
@@ -14,7 +40,7 @@ def create_daily_df(df):
     df["date"] = df["time"].str[:10]
 
     # Define the variables of which we want the mean per day - all other variables are aggregated in a sum. 
-    mean_vars = ["mood", "circumplex.arousal", "circumplex.valence"]
+    mean_vars = ["mood", "circumplex.arousal", "circumplex.valence", "activity"]
 
     # Create the dataframe with the means of variables per day  
     df_means = df[df["variable"].isin(mean_vars)]
@@ -23,13 +49,17 @@ def create_daily_df(df):
     # Create the datafram with the sums of variables per day
     df_sums = df[~df["variable"].isin(mean_vars)]
     df_sums = df_sums.groupby(["id", "date", "variable"], as_index=False)[["value"]].sum()
+    
+    # Create the dataframe with the frequency of screen 
+    df_freq = df[df["variable"]=="screen"]
+    df_freq = df_freq.groupby(["id", "date", "variable"], as_index=False)[["value"]].count()
+    df_freq["variable"] = "frequency"
 
     # Concatenate the two dataframes into the df with daily values
-    df_daily = pd.concat([df_sums, df_means])
+    df_daily = pd.concat([df_sums, df_means, df_freq])
     df_daily = df_daily.sort_values(by=["id", "date"])
 
     return df_daily
-
 
 def create_date_list(df_daily): 
 
@@ -92,8 +122,22 @@ def create_dataframe(df):
                 
                 # Get list of variable values
                 values = df_t[df_t["variable"].isin(variables)]['value'].tolist()
-                values_all = values + len(names_missing) * [float("NaN")]
-
+                if "screen" in names_missing: 
+                    
+                    # the average for that person 
+                    imputations = []
+                    for var in names_missing: 
+                        others = df_daily[(df_daily["id"]==idx) & (df_daily["variable"]==var)] 
+                        if len(others)==0: 
+                            imputation = 0
+                        else: 
+                            imputation = others.mean()
+                        imputations.append(float(imputation))
+                    values_all = values + imputations
+                    
+                else:
+                    values_all = values + len(names_missing) * [0]
+                
                 # Sort values based on the names_all list 
                 values_sorted = [val for name,val in sorted(zip(names_all,values_all))]
                 target = float(df_daily[(df_daily["date"]==target_date) & (df_daily["id"]==idx) & (df_daily["variable"]=="mood")]["value"])
@@ -107,13 +151,13 @@ def create_dataframe(df):
     dataframe = pd.DataFrame(list_of_rows, columns=columns)
 
     return dataframe 
-
-# Read dataset as pandas df
+# # Read dataset as pandas df
 dataset = "dataset_mood_smartphone.csv" 
 df = pd.read_csv(dataset)
+df = df.fillna(method='ffill')
 
 # Create new dataframe 
 dataframe = create_dataframe(df)
 
 # Save dataframe 
-dataframe.to_csv("df_SVM.csv", index=False)
+dataframe.to_csv("df_imp.csv", index=False)
