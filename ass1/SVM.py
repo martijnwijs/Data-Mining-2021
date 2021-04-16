@@ -21,6 +21,8 @@ df = pd.read_csv(dataset)
 # aggregate the dataset 
 df_agg = df.groupby(['no']).mean()
 print(df_agg)
+# sn.heatmap(df_agg)
+# plt.show()
 
 # TO DO: Create new df where it multiplies t=0 with 0.1, t=1 0.2, t=2 0.3, t=3 0.4 
 

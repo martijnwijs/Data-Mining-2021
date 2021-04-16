@@ -92,7 +92,7 @@ def create_dataframe(df):
                 
                 # Get list of variable values
                 values = df_t[df_t["variable"].isin(variables)]['value'].tolist()
-                values_all = values + len(names_missing) * [0]
+                values_all = values + len(names_missing) * [float("NaN")]
 
                 # Sort values based on the names_all list 
                 values_sorted = [val for name,val in sorted(zip(names_all,values_all))]
@@ -116,4 +116,4 @@ df = pd.read_csv(dataset)
 dataframe = create_dataframe(df)
 
 # Save dataframe 
-dataframe.to_csv("dataframe_new.csv", index=False)
+dataframe.to_csv("df_SVM.csv", index=False)
