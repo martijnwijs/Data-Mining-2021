@@ -14,51 +14,59 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn import svm, datasets
 from sklearn.linear_model import LogisticRegressionCV
+from sklearn import preprocessing
+from collections import Counter
+from sklearn import tree
 
-dataset = "dataframe_normalized_outliers_removed.csv" 
+dataset = "dataframe_new.csv" 
 df = pd.read_csv(dataset)
 
 # aggregate the dataset 
 df_agg = df.groupby(['no']).mean()
-print(df_agg)
 
-# TO DO: Create new df where it multiplies t=0 with 0.1, t=1 0.2, t=2 0.3, t=3 0.4 
+# create dataframe for features
+df_X = df_agg.iloc[:, 2:]
 
-# create numpy arrays with data
-X = df_agg.iloc[:, 3:].to_numpy()
-y = df_agg.iloc[:, 1].to_numpy()
-print(X.shape)
-print(y.shape)
+# create numpy arrays with target values
+y = df_agg.iloc[:, 0].to_numpy()
 
-plt.hist(y)
-plt.show()
+c = Counter()
+c.update(y)
+print(c)
+
+weight = {k: len(y)/v for k, v in c.items()}
+print(y)
+
+# Get column names first
+names = df_X.columns
+print(names)
+
+# Create the Scaler object
+scaler = preprocessing.StandardScaler()
+# Fit your data on the scaler object
+scaled_df = scaler.fit_transform(df_X)
+scaled_df = pd.DataFrame(scaled_df, columns=names)
+
+X = scaled_df.to_numpy()
 
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
 # train the SVM 
 
+dtree = tree.DecisionTreeClassifier(max_depth=5).fit(X_train, y_train)
 linear = SVC(kernel='linear', C=1).fit(X_train, y_train)
 rbf = SVC(kernel='rbf', gamma=1, C=1, decision_function_shape='ovr').fit(X_train, y_train)
 poly = SVC(kernel='poly', degree=3, C=1, decision_function_shape='ovr').fit(X_train, y_train)
 sig = SVC(kernel='sigmoid', C=1, decision_function_shape='ovr').fit(X_train, y_train)
 
-# # linear = make_pipeline(StandardScaler(), SVC(kernel='linear', C=1)).fit(X_train, y_train)
-# # rbf = make_pipeline(StandardScaler(), SVC(kernel='rbf', gamma=1, C=1, decision_function_shape='ovr')).fit(X_train, y_train)
-# # poly = make_pipeline(StandardScaler(),SVC(kernel='poly', degree=3, C=1, decision_function_shape='ovr')).fit(X_train, y_train)
-# # sig = make_pipeline(StandardScaler(), SVC(kernel='sigmoid', C=1, decision_function_shape='ovr')).fit(X_train, y_train)
-
 accuracy_lin = linear.score(X_test, y_test)
 accuracy_poly = poly.score(X_test, y_test)
 accuracy_rbf = rbf.score(X_test, y_test)
 accuracy_sig = sig.score(X_test, y_test)
+accuracy_dtree = dtree.score(X_test, y_test)
 
 print("Accuracy Linear Kernel:", accuracy_lin)
 print("Accuracy Polynomial Kernel:", accuracy_poly)
 print("Accuracy Radial Basis Kernel:", accuracy_rbf)
 print("Accuracy Sigmoid Kernel:", accuracy_sig)
-
-# Logistic regression with cross validation! 
-
-# LR = LogisticRegressionCV(cv=3, random_state=42).fit(X_train, y_train)
-# acc = LR.score(X_test, y_test)
-# print("Accuracy Logistic Regression:", acc)
+print("Accuracy Decision Tree:", accuracy_dtree)
