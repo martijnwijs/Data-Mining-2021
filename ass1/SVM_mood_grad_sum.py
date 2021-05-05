@@ -17,21 +17,23 @@ from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import cross_val_score
 from sklearn import preprocessing
 
-dataset = "df_attr_select.csv" 
+dataset = "df_imp.csv" 
 df = pd.read_csv(dataset)
 
 # aggregate the dataset 
-df_agg = df.groupby(['no']).mean()
+df_agg = df[df.columns[3:]].multiply((df["t"]+1)*0.1, axis="index")
+df_agg[["no", "target"]] = df[["no", "target"]]
+df_agg = df_agg.groupby(['no', 'target'], as_index=False).sum()
+
 print(df_agg)
 
-
-df_X = df_agg.iloc[:, 2:]
+df_X = df_agg[["mood", "activity"]]
 scaler = preprocessing.StandardScaler()
 scaled_df = scaler.fit_transform(df_X)
 scaled_df = pd.DataFrame(scaled_df, columns=df_X.columns)
 X = scaled_df.to_numpy()
 
-y = df_agg.iloc[:, 0].to_numpy()
+y = df_agg.iloc[:, 1].to_numpy()
 
 
 # train the SVM 

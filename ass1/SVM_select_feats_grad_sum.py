@@ -38,10 +38,10 @@ scaled_df = pd.DataFrame(scaled_df, columns=df_X.columns)
 X = scaled_df.to_numpy()
 
 # # train the SVM 
-linear = SVC(kernel='linear', C=1, random_state=42)
-rbf = SVC(kernel='rbf', gamma=1, C=1, random_state=42)
-poly = SVC(kernel='poly', degree=3, C=1, random_state=42)
-sig = SVC(kernel='sigmoid', C=1, random_state=42)
+linear = SVC(kernel='linear', C=0.5, random_state=42)
+rbf = SVC(kernel='rbf', gamma=1, C=0.5, random_state=42)
+poly = SVC(kernel='poly', degree=3, C=0.5, random_state=42)
+sig = SVC(kernel='sigmoid', C=0.5, random_state=42)
 
 accuracy_lin = cross_val_score(linear, X, y, cv=10)
 accuracy_poly = cross_val_score(poly, X, y, cv=10)

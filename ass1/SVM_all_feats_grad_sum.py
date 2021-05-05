@@ -19,14 +19,13 @@ from collections import Counter
 from sklearn import tree
 from sklearn.model_selection import cross_val_score
 
+# This svm takes all features into account and adds up the temporal data gradually, so e.g. to calculate the average mood for 4 days it 
+# sums 0.1 * mood_1 + 0.2*mood_2 + 0.3*mood_3 + 0.4 * mood_4 
 
-dataset = "dataframe_new.csv" 
+dataset = "df_imp.csv" s
 df = pd.read_csv(dataset)
 
 # aggregate the dataset 
-# df_agg = df.groupby(['no']).mean()
-# print(df_agg)
-
 df_agg = df[df.columns[3:]].multiply((df["t"]+1)*0.1, axis="index")
 df_agg[["no", "target"]] = df[["no", "target"]]
 df_agg = df_agg.groupby(['no', 'target'], as_index=False).sum()
@@ -37,12 +36,12 @@ df_X = df_agg.iloc[:, 2:]
 # create numpy arrays with target values
 y = df_agg.iloc[:, 1].to_numpy()
 
-# c = Counter()
-# c.update(y)
-# print(c)
+c = Counter()
+c.update(y)
+print(c)
 
-# weight = {k: len(y)/v for k, v in c.items()}
-# print(y)
+weight = {k: len(y)/v for k, v in c.items()}
+print(y)
 
 # Get column names first
 names = df_X.columns
@@ -56,14 +55,7 @@ scaled_df = pd.DataFrame(scaled_df, columns=names)
 X = scaled_df.to_numpy()
 
 # train the SVM 
-
-# dtree = tree.DecisionTreeClassifier(max_depth=5).fit(X_train, y_train)
-# linear = SVC(kernel='linear', C=1).fit(X_train, y_train)
-# rbf = SVC(kernel='rbf', gamma=1, C=1, decision_function_shape='ovr').fit(X_train, y_train)
-# poly = SVC(kernel='poly', degree=3, C=1, decision_function_shape='ovr').fit(X_train, y_train)
-# sig = SVC(kernel='sigmoid', C=1, decision_function_shape='ovr').fit(X_train, y_train)
-
-linear = SVC(kernel='linear', C=1, random_state=42)
+linear = SVC(kernel='linear', C=1, class_weight=weight, random_state=42)
 rbf = SVC(kernel='rbf', gamma=1, C=1, random_state=42)
 poly = SVC(kernel='poly', degree=3, C=1, random_state=42)
 sig = SVC(kernel='sigmoid', C=1, random_state=42)

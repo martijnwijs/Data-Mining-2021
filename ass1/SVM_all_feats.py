@@ -17,7 +17,7 @@ from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import cross_val_score
 from sklearn import preprocessing
 
-dataset = "dataframe_new.csv" 
+dataset = "df_imp.csv" 
 df = pd.read_csv(dataset)
 
 # aggregate the dataset 
