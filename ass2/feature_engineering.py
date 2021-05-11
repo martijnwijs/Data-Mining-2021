@@ -1,3 +1,12 @@
+import pandas as pd
+import numpy as np
+from sklearn.metrics import ndcg_score
+
+def preprocess_dates(df):
+    df.date_time = pd.to_datetime(df.date_time)
+    df['year'], df['month'], df['day'], df['hour'], df['minute'] = df.date_time.dt.year, df.date_time.dt.month, df.date_time.dt.day, df.date_time.dt.hour, df.date_time.dt.minute
+    return df
+
 def rank_variable(df, variable):
     '''ranks on a given variable, can be used as first baseline'''
     search_ids = df.srch_id.unique()
@@ -46,4 +55,5 @@ def evaluate_score(df):
     
     score = score/len(search_ids)
     return "average NDCG:", score
+
 
