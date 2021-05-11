@@ -35,7 +35,6 @@ def add_scores(row):
     if row["click_bool"] == 1: 
         val += 1
     return val
-    
 train["scores"] = train.apply (lambda row: add_scores(row), axis=1) 
 
 def evaluate_score(df):
