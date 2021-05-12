@@ -7,10 +7,6 @@ def preprocess_dates(df):
     df['year'], df['month'], df['day'], df['hour'], df['minute'] = df.date_time.dt.year, df.date_time.dt.month, df.date_time.dt.day, df.date_time.dt.hour, df.date_time.dt.minute
     return df
 
-
-
-
-### ws moet dit niet bij feature engineering
 def rank_variable(df, variable):
     '''ranks on a given variable, can be used as first baseline'''
     search_ids = df.srch_id.unique()
@@ -39,7 +35,6 @@ def add_scores(row):
     if row["click_bool"] == 1: 
         val += 1
     return val
-    
 train["scores"] = train.apply (lambda row: add_scores(row), axis=1) 
 
 def evaluate_score(df):
@@ -60,7 +55,5 @@ def evaluate_score(df):
     
     score = score/len(search_ids)
     return "average NDCG:", score
-
-#####
 
 
