@@ -8,12 +8,10 @@ def preprocess_dates(df):
     return df
 
 def rank_variable(df, variable):
-    '''ranks on a given variable, can be used as first baseline'''
-    search_ids = df.srch_id.unique()
-    # loop over search ids
-    for search_id in search_ids:
-        df.loc[df["srch_id"] == search_id] = df[df["srch_id"] == search_id].sort_values(variable, ascending=False).values 
-    return df
+    '''ranks on variable, way faster now because of groupby'''
+    df_agg = df.groupby("srch_id")
+    df_agg.apply(lambda _df: _df.sort_values(by=['srch_id']))
+    return df_agg
 
 def rank_variable_copy(df, variable):
     '''ranks on variable, returns copy, used for evaluate_score()'''
@@ -37,8 +35,11 @@ def add_scores(row):
     return val
 train["scores"] = train.apply (lambda row: add_scores(row), axis=1) 
 
-def evaluate_score(df):
+def evaluate_score(X_val, y_val):
     '''calculate the ndcg over all entries and averages, input dataframe'''
+    X_val_agg = X_val.groupby("srch_id")
+    X_val_agg.apply(lambda _df: _df.sort_values(by=['srch_id']))
+    
     score = 0.
     search_ids = df.srch_id.unique() # get unique id's
     #search_ids = df.srch_id.unique() # get unique id's
