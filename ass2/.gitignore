@@ -2,3 +2,7 @@
 /training_set_VU_DM.csv
 data/ 
 __pycache__/
+/fastscript.py 
+lambdaMART/lrenv/
+lambdaMART/lambdaMART.ipynb 
+
