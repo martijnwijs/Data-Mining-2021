@@ -56,4 +56,11 @@ def evaluate_score(X_val, y_val):
     score = score/len(search_ids)
     return "average NDCG:", score
 
-
+def categorical_to_dummy(df, variable):
+    '''transforms categorical variables into dummy variables'''
+    dummies = pd.get_dummies(df[variable])
+    merged = pd.concat([df, dummies], axis='columns') # concatonate
+    # drop original column
+    # you have to drop one dummy variabale column, because of colliniearity
+    final = merged.drop([variable, 1], axis='columns')
+    return df

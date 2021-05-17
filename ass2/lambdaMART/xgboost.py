@@ -35,7 +35,7 @@ def Groupshufflesplit(df, size=None, features):
 
 
 # global variables
-file_name = "xbg.pkl"
+
 
 features = ['srch_id', 'site_id', 'visitor_location_country_id',
     'visitor_hist_starrating', 'visitor_hist_adr_usd', 'prop_country_id',
@@ -57,12 +57,17 @@ features = ['srch_id', 'site_id', 'visitor_location_country_id',
 
 training = True
 
-if __name__ == "main":
+if __name__ == __"main"__:
+
+    options = [ "Training", "Testing"]
+    chosen_option = prompt_option(options, "option")
 
     # train the model
-    if training == True:
+    if chosen_option == "Training":
+
         # import dataset
-        df = pd.read_csv("training_set_VU_DM.csv")
+        name_dataset = input("give the name of the dataset + .csv")
+        df = pd.read_csv(name_dataset)
         print("dataset loaded")
 
         # XBG initialization
@@ -81,8 +86,14 @@ if __name__ == "main":
         #df["scores"] = df.apply (lambda row: add_scores(row), axis=1) 
         
         # extract relevant features from dataset
-
-        X_train, y_train, X_val, y_val, groups = Groupshufflesplit(df, 100000, features) # change this value to get different sizes
+        print("do you want to use the whole dataset? this means longer training time...")
+        options = [ "Yes", "No"]
+        chosen_option = prompt_option(options, "option")
+        if chosen_option == Yes:
+            size = None
+        else:
+            size = 100000
+        X_train, y_train, X_val, y_val, groups = Groupshufflesplit(df, size, features) # change this value to get different sizes
 
         print("data prepared, starting training...")
         model.fit(X_train, y_train, group=groups, verbose=True) # train the model
@@ -96,16 +107,22 @@ if __name__ == "main":
         print("validation_ndcg: ", val_ndcg)
         
         # save
-        pickle.dump(model, open(file_name, "wb"))
+        model_name = input("give the name of the model ")
+        pickle.dump(model, open(model_name, "wb"))
         print("model saved")
         print("finished")
 
     # evaluate on testset
-    if testing==True:
+    if chosen_option == "Testing":
 
         # load model
-        model = pickle.load(open(file_name, "rb"))
-        print("xgboost loaded")
+        try:
+            model_name = input("give the name of the model ")
+            model = pickle.load(open(model_name, "rb"))
+            print("xgboost loaded")
+        exept:
+            print("no model with this name!")
+            quit()
 
         # import dataset
         df_test = pd.read_csv("test_set_VU_DM.csv")
@@ -125,6 +142,7 @@ if __name__ == "main":
         print("rearranged on scores per search query")
 
         # output to csv file
-        pandas_to_csv(output_ranked, filename="out3.csv")
+        output_name = input("give the name of the output file: ")
+        pandas_to_csv(output_ranked, filename=output_name)
         print("saved as csv file")
         print("finished")
