@@ -26,20 +26,19 @@ def pandas_to_csv(df, name):
     df[["srch_id", "prop_id"]].to_csv(name, index=False)
 
 def add_scores(row):
-    '''adds scores to dataframe to evaluate performance'''
+    '''adds SCORES to dataframe'''
     val = 0
     if row["booking_bool"] == 1: 
         val += 5
     if row["click_bool"] == 1: 
         val += 1
     return val
-train["scores"] = train.apply (lambda row: add_scores(row), axis=1) 
 
 def evaluate_score(X_val, y_val):
     '''calculate the ndcg over all entries and averages, input dataframe'''
     X_val_agg = X_val.groupby("srch_id")
     X_val_agg.apply(lambda _df: _df.sort_values(by=['srch_id']))
-    
+
     score = 0.
     search_ids = df.srch_id.unique() # get unique id's
     #search_ids = df.srch_id.unique() # get unique id's

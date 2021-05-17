@@ -8,16 +8,12 @@ def preprocess_dates(df):
     return df
 
 
-
-
-### ws moet dit niet bij feature engineering
 def rank_variable(df, variable):
-    '''ranks on a given variable, can be used as first baseline'''
-    search_ids = df.srch_id.unique()
-    # loop over search ids
-    for search_id in search_ids:
-        df.loc[df["srch_id"] == search_id] = df[df["srch_id"] == search_id].sort_values(variable, ascending=False).values 
-    return df
+    '''ranks on variable, way faster now because of groupby'''
+    df_agg = df.groupby("srch_id")
+    df_agg.apply(lambda _df: _df.sort_values(by=['srch_id']))
+    return df_agg
+
 
 def rank_variable_copy(df, variable):
     '''ranks on variable, returns copy, used for evaluate_score()'''
@@ -31,16 +27,19 @@ def pandas_to_csv(df, name):
     '''returns csv file with name out.csv from dataset'''
     df[["srch_id", "prop_id"]].to_csv(name, index=False)
 
-def add_scores(row):
-    '''adds scores to dataframe to evaluate performance'''
-    val = 0
-    if row["booking_bool"] == 1: 
-        val += 5
-    if row["click_bool"] == 1: 
-        val += 1
-    return val
-    
-train["scores"] = train.apply (lambda row: add_scores(row), axis=1) 
+def add_scores(df):
+    '''add score column to dataframe'''
+        def add_(row)
+        '''adds scores to dataframe to evaluate performance'''
+        val = 0
+        if row["booking_bool"] == 1: 
+            val += 5
+        if row["click_bool"] == 1: 
+            val += 1
+        return val
+    df["score"] = df.apply (lambda row: add_(row), axis=1) 
+    return df
+
 
 def evaluate_score(df):
     '''calculate the ndcg over all entries and averages, input dataframe'''
@@ -61,6 +60,5 @@ def evaluate_score(df):
     score = score/len(search_ids)
     return "average NDCG:", score
 
-#####
 
 
