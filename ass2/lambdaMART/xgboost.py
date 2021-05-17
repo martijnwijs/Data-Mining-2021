@@ -55,6 +55,7 @@ features = ['srch_id', 'site_id', 'visitor_location_country_id',
     'comp7_rate_percent_diff', 'comp8_rate', 'comp8_inv',
     'comp8_rate_percent_diff']
 
+training = True
 
 if __name__ == "main":
 
@@ -77,7 +78,7 @@ if __name__ == "main":
             )
 
         # add scores to dataframe
-        df["scores"] = df.apply (lambda row: add_scores(row), axis=1) 
+        #df["scores"] = df.apply (lambda row: add_scores(row), axis=1) 
         
         # extract relevant features from dataset
 
