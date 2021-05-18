@@ -1,3 +1,6 @@
+import numpy as np
+from sklearn.metrics import ndcg_score
+
 def evaluate_score(y_predict, y_score, groups):
     '''calculate the ndcg over all entries and averages, input: y_predict as output array of xgboost
        y_score as score dataframe pandas'''
