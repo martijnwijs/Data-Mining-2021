@@ -2,7 +2,7 @@
 from imputations import *
 import pandas as pd 
 import argparse
-
+from downsampling import *
 
 
 
@@ -53,6 +53,8 @@ if __name__ == "__main__":
     print("datasets loaded")
     print("size trainingset: ", len(df.index))
 
+    # downsampling
+    df = downsample(df)
   
     # imputations
     df = replace_negative(df)
@@ -76,7 +78,6 @@ if __name__ == "__main__":
     df["scores"] = df.apply (lambda row: add_scores(row), axis=1)
     print("added scores")
 
-
     '''
     # categorical to dummy variables
     categorical = ['srch_id', 'site_id', 'visitor_location_country_id','prop_country_id','prop_id', 'srch_destination_id']
@@ -85,8 +86,8 @@ if __name__ == "__main__":
         df = categorical_to_dummy(df, variable)
         df_test = categorical_to_dummy(df_test, variable)
     print("added dummy variables")
-   
     '''
+
     # save as csv
     # output to csv file
     output_name = input("give the name of the output file without .csv: ")
@@ -95,6 +96,4 @@ if __name__ == "__main__":
     df.to_csv(output_train, index=False)
     df_test.to_csv(output_test, index=False)
     print("finished")
-
-
-
+  

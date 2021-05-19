@@ -9,10 +9,11 @@ import numpy as np
 from sklearn.metrics import ndcg_score
 import pickle
 from preprocessing.feature_engineering import *
+from preprocessing.downsampling import *
 
 warnings.filterwarnings(action='ignore', category=UserWarning)
 
-def Groupshufflesplit(df, features, size=None):
+def Groupshufflesplit(df, features, size=None, downsample=False):
     '''splits the training dataset in a train + validation dataset, if argument size is given, only a part of the dataset is used to train faster
     groups give the indices of the different srch id's'''
     if size is not None: # use only part of dataset
@@ -22,6 +23,10 @@ def Groupshufflesplit(df, features, size=None):
 
     X_train_inds, X_test_inds = next(gss)
     train_data= df.iloc[X_train_inds]
+    '''
+    if downsample == True: # downsampling
+        train_data = downsample(train_data)
+    '''
     X_train = train_data.loc[:, ~train_data.columns.isin(['scores'])]
     y_train = train_data.loc[:, train_data.columns.isin(['scores'])]
     groups = train_data.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
@@ -30,7 +35,6 @@ def Groupshufflesplit(df, features, size=None):
     #We need to keep the id for later predictions
     X_val = test_data.loc[:, ~test_data.columns.isin(['scores'])]
     y_val = test_data.loc[:, test_data.columns.isin(['scores'])]
-
 
     # remove features
     X_train = X_train[features]
@@ -58,7 +62,7 @@ features = ['srch_id', 'site_id', 'visitor_location_country_id',
     'comp5_rate_percent_diff', 'comp6_rate', 'comp6_inv',
     'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv',
     'comp7_rate_percent_diff', 'comp8_rate', 'comp8_inv',
-    'comp8_rate_percent_diff', 'year', 'month']
+    'comp8_rate_percent_diff', 'year', 'month', 'hour']
 '''
 srch_id,date_time,site_id,visitor_location_country_id,visitor_hist_starrating,
 visitor_hist_adr_usd,prop_country_id,prop_id,prop_starrating,prop_review_score,prop_brand_bool,
@@ -107,7 +111,17 @@ if __name__ == "__main__":
             size = None
         else:
             size = 100000
+        '''
+        print("do you want to downsample...")
+
+        chosen_option = input("Yes, No: ")
+        if chosen_option == "Yes":
+            downsample = True
+        else:
+            downsample = False
+        '''
         X_train, y_train, X_val, y_val, groups = Groupshufflesplit(df, features, size) # change this value to get different sizes
+
 
         print("data prepared, starting training...")
         model.fit(X_train, y_train, group=groups, verbose=True) # train the model
@@ -142,10 +156,10 @@ if __name__ == "__main__":
         name_dataset = input("give the name of the dataset + .csv: ")
         
         df_test = pd.read_csv(name_dataset)
-        df_test = df_test[:1000] #####
+        #df_test = df_test[:1000] #####
         print("dataset loaded")
         X_test = df_test[features]
-
+        print(df_test.shape[0])
         # predict
         y_test_predict = model.predict(X_test)
         print("predicted y values!")
@@ -153,7 +167,7 @@ if __name__ == "__main__":
         # create output df
         output = df_test[["srch_id", "prop_id"]]
         output["scores"] = y_test_predict
-
+        print(output.shape[0])
         # rank on score
         output_ranked = rank_variable(output, "scores")
         print("rearranged on scores per search query")

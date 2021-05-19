@@ -9,9 +9,11 @@ def preprocess_dates(df):
 
 def rank_variable(df, variable):
     '''ranks on variable, way faster now because of groupby'''
-    df_agg = df.groupby("srch_id")
-    df_agg.apply(lambda _df: _df.sort_values(by=['srch_id']))
-    return df_agg
+    df_agg = df.groupby("srch_id", group_keys=False)
+    d = df_agg.apply(lambda x: x.sort_values(by='scores', ascending=False))
+    d.reset_index()
+    df_new = d[['srch_id','prop_id','scores']].reset_index()
+    return df_new[['srch_id','prop_id','scores']]
 
 def rank_variable_copy(df, variable):
     '''ranks on variable, returns copy, used for evaluate_score()'''
@@ -21,9 +23,10 @@ def rank_variable_copy(df, variable):
         df_copy.loc[df_copy["srch_id"] == search_id] = df_copy[df_copy["srch_id"] == search_id].sort_values(variable, ascending=False).values 
     return df_copy
 
-def pandas_to_csv(df, name):
-    '''returns csv file with name out.csv from dataset'''
+def test_output_to_csv(df, name):
+    '''returns csv file with name from dataset'''
     df[["srch_id", "prop_id"]].to_csv(name, index=False)
+    return
 
 def add_scores(row):
     '''adds SCORES to dataframe'''
@@ -34,8 +37,9 @@ def add_scores(row):
         val += 1
     return val
 
+'''
 def evaluate_score(X_val, y_val):
-    '''calculate the ndcg over all entries and averages, input dataframe'''
+
     X_val_agg = X_val.groupby("srch_id")
     X_val_agg.apply(lambda _df: _df.sort_values(by=['srch_id']))
 
@@ -55,12 +59,15 @@ def evaluate_score(X_val, y_val):
     
     score = score/len(search_ids)
     return "average NDCG:", score
+'''
 
 def categorical_to_dummy(df, variable):
     '''transforms categorical variables into dummy variables'''
-    dummies = pd.get_dummies(df[variable])
+    dummies = pd.get_dummies(df[variable]).astype(np.int8)
     merged = pd.concat([df, dummies], axis='columns') # concatonate
     # drop original column
     # you have to drop one dummy variabale column, because of colliniearity
     final = merged.drop([variable, 1], axis='columns')
     return df
+
+
