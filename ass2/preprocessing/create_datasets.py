@@ -71,6 +71,10 @@ if __name__ == '__main__':
     down_bools = [True, False]
     feat_bools = [True, False]
 
+    # imputations = ['opp']
+    # down_bools = [False]
+    # feat_bools = [True]
+
     for imp in imputations: 
         for down in down_bools: 
             if down: 

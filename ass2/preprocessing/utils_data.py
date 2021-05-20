@@ -28,9 +28,7 @@ def add_labels(df):
 
 
 def price_order(df):
-    df.sort_values(by=['srch_id', 'price_usd'], inplace=True)
     df['price_order'] = df.groupby(['srch_id'])['price_usd'].apply(lambda x: np.argsort(x))
-    df = df.apply(lambda x: x + 1 if x.name == 'price_order' else x)
     return df
 
 def count_window(df):
