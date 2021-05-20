@@ -31,7 +31,7 @@ X_train = training_data[col_names].values
 y_train = training_data.iloc[:,-2:].apply(relevance,axis = 1)
 
 validation_data[col_names].values,validation_data.iloc[:,-2:].apply(relevance,axis = 1)
-col_names].values,test_data.iloc[:,-2:].apply(relevance,axis = 1)
+col_names.values,test_data.iloc[:,-2:].apply(relevance,axis = 1)
 
 dump_svmlight_file(training_data_new[col_names].values,training_data.iloc[:,-2:].apply(relevance,axis = 1),'../data/svmlight_training_avg_mean_std_competitors_m2.txt',query_id=training_data_new.srch_id)
 dump_svmlight_file(validation_data_new[col_names].values,validation_data.iloc[:,-2:].apply(relevance,axis = 1),'../data/svmlight_validation_avg_mean_std_competitors_m2.txt',query_id=validation_data_new.srch_id)
