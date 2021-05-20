@@ -5,4 +5,8 @@ __pycache__/
 /fastscript.py 
 lambdaMART/lrenv/
 lambdaMART/lambdaMART.ipynb 
+.ipynb_checkpoints/
+houch/
+lezz/
+/random_notes.ipynb
 
